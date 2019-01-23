@@ -1,0 +1,6 @@
+name=Beta
+imageFileSuffix=.png
+firstFrame=0
+numFrames=144
+framesPerRotation=12
+framesPerAnimation=1

@@ -1,0 +1,3 @@
+floorTexture = block2.png
+
+playerTexture = block1.png
