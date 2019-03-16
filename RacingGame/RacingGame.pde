@@ -12,16 +12,19 @@ void setup() {
   size(640, 640, P3D);
   //fullScreen(P3D);
   noSmooth();
-  perspective(PI/2.0,width/height,0.001,1000.0);
+  perspective(0.75*PI, width/height, 0.001, 10000.0);
+  blendMode(ADD);
   initializeGlobals();
   loadGameAssets();
-  
-  player.jumpToFace(ground[1]);
+
+  player=players[0];
+  player.jumpToFace(ground[10]);
+  ai = new DirectionalAI(player);
 }
 
 void draw() {
   time++;
-  
+
   if (mousePressed) for (int i = 0; i < 4; i++) {
     //face.vertices[i]=PVector.random3D().mult(100);
     //face.normalIsInitialized=false;
@@ -140,6 +143,9 @@ void keyReleased() {
   case '1':
     debug = 1;
     break;
+  case '2':
+    debug = 2;
+    break;
   case '0':
     debug = 0;
     break;
@@ -158,6 +164,20 @@ void keyReleased() {
   case 'w':
   case 'W':
     player.up=false;
+    break;
+  case 'q':
+  case 'Q':
+    controlledByAI = !controlledByAI;
+    player.left=false;
+    player.right=false;
+    player.up=false;
+    player.down=false;
+    player.jump=false;
+    break;
+  case 'e':
+  case 'E':
+    player.b=(player.b+1)%player.images[player.a].length;
+    if (player.b==0) player.a=(player.a+1)%player.images.length;
     break;
   }
 }

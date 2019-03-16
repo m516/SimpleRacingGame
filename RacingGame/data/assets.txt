@@ -1,3 +1,5 @@
-floorTexture = block2.png
-
+floorTexture = Track2.png
 playerTexture = block1.png
+trackData = Route04.obj
+playerDataFolder = player_assets
+playerFolders = beta

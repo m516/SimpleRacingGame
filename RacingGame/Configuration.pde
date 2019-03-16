@@ -8,11 +8,64 @@ void loadGameAssets() {
   try {
     props.load(createReader(assetPath));
     println(props);
+    //Load the player sprite 
+    //TODO replace with image folder
     player.sprite = loadImage(props.getProperty("playerTexture"));
+    //Load the ground texture
     PImage groundImage = loadImage(props.getProperty("floorTexture"));
     face.img = groundImage;
     face2.img = groundImage;
-    parseWavefrontIntoLevel("Route64Sqrares.obj", groundImage);
+    //Load the level
+    parseWavefrontIntoLevel(props.getProperty("trackData"), groundImage);
+    //Load the player data
+    String[] playerFolders = split(props.getProperty("playerFolders"),',');
+    println((Object[])playerFolders);
+    
+    players = new DirectionalPlayer[playerFolders.length];  
+    //For each player folder
+    for(int i = 0; i < playerFolders.length; i++){
+      String playerFolder = playerFolders[i];
+      //Get its properties and directory
+      StringBuilder stringBuilder = new StringBuilder();
+      stringBuilder.append(props.getProperty("playerDataFolder"));
+      stringBuilder.append("/");
+      stringBuilder.append(playerFolder);
+      stringBuilder.append("/");
+      Properties playerProps = new Properties();
+      
+      String relativePath = stringBuilder.toString(); 
+      
+      stringBuilder = new StringBuilder(relativePath);
+      stringBuilder.append("config.txt");
+      playerProps.load(createReader(stringBuilder.toString()));
+      println(playerProps);
+      
+      //Initialize the player
+      players[i]=new DirectionalPlayer();
+      DirectionalPlayer p = (DirectionalPlayer) players[i];//Shorthand
+      
+      //Get the sprite's name and place it in the name folder
+      p.name = playerProps.getProperty("name");
+      
+      //Populate the image array
+      int numRots = Integer.parseInt(playerProps.getProperty("framesPerRotation"));
+      int numAnim = Integer.parseInt(playerProps.getProperty("framesPerAnimation"));
+      int numFrames = Integer.parseInt(playerProps.getProperty("numFrames"));
+      p.images = new PImage[numFrames/numRots/numAnim][numRots][numAnim];
+      int minImageNum = Integer.parseInt(playerProps.getProperty("firstFrame"));
+      String imageFileSuffix = playerProps.getProperty("imageFileSuffix");
+      
+      //For each image
+      for(int j = 0; j < numFrames; j++){
+        //Complete image file name
+        stringBuilder = new StringBuilder(relativePath);
+        stringBuilder.append(nf(j+minImageNum, 4));
+        stringBuilder.append(imageFileSuffix);
+        
+        p.images[j/numRots/numAnim][(j/numAnim)%numRots][j%numAnim] = loadImage(stringBuilder.toString());
+        println(stringBuilder.toString());
+      }
+    }
   }
   catch(IOException e) {
     e.printStackTrace();
@@ -74,8 +127,8 @@ void parseWavefrontIntoLevel(String filename, PImage texture) {
         DrawableFace face = new DrawableFace(s.length-1);
         for (int i = 0; i < s.length-1; i++) {
           String[] vert = split(s[i+1], '/');
-          face.vertices[i]=verts.get(int(vert[0])-1); //<>//
-          face.uv[i]=textureCoordinates.get(int(vert[1])-1); //<>//
+          face.vertices[i]=verts.get(int(vert[0])-1);
+          face.uv[i]=textureCoordinates.get(int(vert[1])-1);
         }
         face.img = texture;
         face.recalculateNormalAndPosition();

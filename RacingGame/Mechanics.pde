@@ -183,7 +183,16 @@ class DrawableFace extends Face {
 
   void draw() {
     textureMode(NORMAL);
-    beginShape(QUADS);
+    switch(vertices.length) {
+    case 3:
+      beginShape(TRIANGLE);
+      break;
+    case 4:
+      beginShape(QUADS);
+      break;
+    default:
+      beginShape(TRIANGLE_FAN);
+    }
 
     if (img==null) {
       specular(imgColor);
@@ -282,7 +291,7 @@ class Player extends Movement {
   void update() {
     if (accelerationEnabled) velocity.add(acceleration);
     if (velocityEnabled) position.add(velocity);
-    velocity.normalize(direction);
+    if (velocity.magSq()>0.01)velocity.normalize(direction);
   }
   void enableAccleration() {
     accelerationEnabled=true;
@@ -307,6 +316,7 @@ class Player extends Movement {
     //pushMatrix();
     textureMode(NORMAL);
     beginShape(QUADS);
+    blendMode(BLEND);
     if (sprite==null) {
       specular(spriteColor);
       emissive(0);
@@ -322,5 +332,80 @@ class Player extends Movement {
     vertex(position.x-0.5, position.y, position.z, 0.0, 1.0);
     endShape();
     //popMatrix();
+  }
+
+  void draw(float phi, float theta) {
+    //strokeWeight(4);
+    //stroke(255);
+    textureMode(NORMAL);
+    blendMode(BLEND);
+    pushMatrix();
+    translate(position.x, position.y, position.z);
+    //scale(2.0);
+    beginShape(QUADS);
+    if (sprite==null) {
+      specular(spriteColor);
+      emissive(0);
+      ambient(0);
+    } else {
+      noStroke();
+      emissive(255);
+      texture(sprite);
+    }
+
+    float[][] verts = {
+      {-1.0, -1.0, 0.0}, 
+      {-1.0, 1.0, 0.0}, 
+      { 1.0, 1.0, 0.0}, 
+      { 1.0, -1.0, 0.0}};
+
+    float mag = sqrt(2);
+
+
+    for (int i = 0; i < 4; i ++) {
+      //Constrain vectors to magnitudes of 1
+      verts[i][0]/=mag;
+      verts[i][1]/=mag;
+      verts[i][2]/=mag;
+
+      //Rotate locking the x-axis
+      if (verts[i][1]<0) {
+        verts[i][1]=sin(phi+HALF_PI);
+        verts[i][2]=cos(phi+HALF_PI);
+      } else {
+        verts[i][1]=sin(phi+3.0*HALF_PI);
+        verts[i][2]=cos(phi+3.0*HALF_PI);
+      }
+
+      //Rotate locking the y-axis
+      float dir = atan2(verts[i][2], verts[i][0])-HALF_PI;
+      verts[i][0] = cos(dir+theta);
+      verts[i][2] = sin(dir+theta);
+    }
+
+    vertex(verts[0][0], verts[0][1] - 0.5, verts[0][2], 1.0, 1.0);
+    vertex(verts[1][0], verts[1][1] - 0.5, verts[1][2], 1.0, 0.0);
+    vertex(verts[2][0], verts[2][1] - 0.5, verts[2][2], 0.0, 0.0);
+    vertex(verts[3][0], verts[3][1] - 0.5, verts[3][2], 0.0, 1.0);
+
+    /*
+    float cosPhi = cos(-cos(phi)*QUARTER_PI+HALF_PI),
+     sinPhi = sin(-cos(phi)*QUARTER_PI+HALF_PI),
+     cosTheta = cos(theta),
+     sinTheta = sin(theta);
+     
+     
+     vertex(sinPhi*cos(theta+QUARTER_PI),cosPhi-0.5,sinPhi*sin(theta+QUARTER_PI),0.0,1.0);
+     vertex(sinPhi*cos(theta+3.0*QUARTER_PI),-cosPhi-0.5,sinPhi*sin(theta+3.0*QUARTER_PI),0.0,0.0);
+     vertex(sinPhi*cos(theta+5.0*QUARTER_PI),-cosPhi-0.5,sinPhi*sin(theta+5.0*QUARTER_PI),1.0,0.0);
+     vertex(sinPhi*cos(theta+7.0*QUARTER_PI),cosPhi-0.5,sinPhi*sin(theta+7.0*QUARTER_PI),1.0,1.0);
+     */
+
+    //vertex(position.x-2.5*cos(phi)*cos(theta), position.y+2.5*sin(phi), position.z+2.5*cos(phi)*sin(theta), 1.0, 1.0);
+    //vertex(position.x-2.5*cos(phi)*cos(theta), position.y-2.5*sin(phi), position.z-2.5*cos(phi)*sin(theta), 1.0, 0.0);
+    //vertex(position.x+2.5*cos(phi)*cos(theta), position.y-2.5*sin(phi), position.z-2.5*cos(phi)*sin(theta), 0.0, 0.0);
+    //vertex(position.x+2.5*cos(phi)*cos(theta), position.y+2.5*sin(phi), position.z+2.5*cos(phi)*sin(theta), 0.0, 1.0);
+    endShape();
+    popMatrix();
   }
 }
