@@ -6,13 +6,15 @@ void render(){
   //Disable default lights
   noLights();
   //Manually add lights
-  pointLight(0.0, 0.0, 255.0, player.position.x, player.position.y-20, player.position.z);
-  lightSpecular(0, 0, 0);
-  ambientLight(0, 0, 0);
+  pointLight(512, 255, 200, player.position.x, player.position.y-20, player.position.z);
+  directionalLight(32, 16, 8, player.position.x, player.position.y, player.position.z);
+  lightSpecular(255, 255, 255);
+  ambientLight(8, 16, 128);
   shininess(1.0);
+  // Material properties (usually overwritten, see DrawableFace.draw() in Mechanics tab)
   specular(255, 255, 255);
   emissive(0, 0, 0);
-  ambient(0, 0, 0);
+  ambient(8, 16, 128);
   
   //Draw test faces
   //stroke(32, 64, 255);
@@ -20,8 +22,8 @@ void render(){
   if(debug==0) noStroke();
   pushMatrix();
 
-  face.draw();
-  face2.draw();
+//  face.draw();
+//  face2.draw(); // Debugging face rendering
   
   for(int i = 0; i < ground.length; i++){
     if(debug>0){

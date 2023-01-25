@@ -11,7 +11,6 @@
 void setup() {
   size(640, 640, P3D);
   //fullScreen(P3D);
-  noSmooth();
   perspective(0.75*PI, width/height, 0.001, 10000.0);
   blendMode(ADD);
   initializeGlobals();
@@ -30,7 +29,7 @@ void draw() {
     //face.normalIsInitialized=false;
     player.jump=true;
   }
-
+  
   render();
 }
 

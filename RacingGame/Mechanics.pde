@@ -200,7 +200,9 @@ class DrawableFace extends Face {
       ambient(0);
     } else {
       //noStroke();
-      emissive(255);
+      emissive(0);
+      specular(255, 255, 255);
+      ambient(255, 255, 255);
       texture(img);
     }
 
@@ -312,7 +314,7 @@ class Player extends Movement {
     return velocityEnabled;
   }
 
-  @Override void draw() {
+  void draw() {
     //pushMatrix();
     textureMode(NORMAL);
     beginShape(QUADS);
